@@ -94,7 +94,7 @@ def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, pair
 
 
 			OPT_DB.zero_grad()
-			X_BH = XA_BUFFER.push_and_pop(X_B_)
+			X_BH = XB_BUFFER.push_and_pop(X_B_)
 			LDB = (GAN_Loss(DIS_A(X_B), RL) + GAN_Loss(DIS_A(X_BH.detach()), FL)) / 2
 			LDB.backward()
 			OPT_DA.step()
@@ -102,8 +102,8 @@ def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, pair
 			logger.debug(f'[{nb_epochs:03d}/{epoch_counter:03d}]:{idx:05d} >> TOT : {TOT.item():07.3f}, LDA : {LDA.item():07.3f}, LDB : {LDB.item():07.3f}')
 			if idx % 10 == 0:
 				X_A = X_A.cpu()
-				X_A_ = X_A_.cpu()
-				XA_RES = th.cat([X_A, X_A_], dim=-1)
+				X_B_ = X_B_.cpu()
+				XA_RES = th.cat([X_A, B_A_], dim=-1)
 				XA_RES = to_grid(XA_RES, nb_rows=1) 
 				XA_RES = th2cv(XA_RES) * 255
 				cv2.imwrite(path.join(storage, f'img_{epoch_counter:03d}{idx:03d}.jpg'), XA_RES)
