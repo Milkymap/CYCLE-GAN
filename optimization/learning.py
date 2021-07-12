@@ -13,6 +13,9 @@ from optimization.history import History
 from models.generator import Generator
 from models.discriminator import Discriminator
 
+from libraries.log import logger 
+from libraries.strategies import * 
+
 
 @click.command()
 @click.option('--gpu_idx', help='index of gpu core', type=int)
@@ -23,7 +26,8 @@ from models.discriminator import Discriminator
 @click.option('--nb_epochs', help='number of epochs', type=int)
 @click.option('--bt_size', help='batch size', type=int)
 @click.option('--paired/--no-paired', help='is paired or not', default=True)
-def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, paired):
+@click.option('--storage', help='storage dir for sampled data', type=click.Path(True))
+def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, paired, storage):
 	device = th.device(f'cuda:{gpu_idx}' if th.cuda.is_available() else 'cpu')
 	G_A2B = Generator(3, 64, 2, 6).to(device)
 	G_B2A = Generator(3, 64, 2, 6).to(device)
@@ -94,8 +98,15 @@ def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, pair
 			LDB = (GAN_Loss(DIS_A(X_B), RL) + GAN_Loss(DIS_A(X_BH.detach()), FL)) / 2
 			LDB.backward()
 			OPT_DA.step()
-			
-			print(TOT.item(), LDA.item(), LDB.item())
+
+			logger.debug(f'[{nb_epochs:03d}/{epoch_counter:03d}]:{idx:05d} >> TOT : {TOT.item():07.3f}, LDA : {LDA.item():07.3f}, LDB : {LDB.item():07.3f}')
+			if idx % 10 == 0:
+				X_A = X_A.cpu()
+				X_A_ = X_A_.cpu()
+				XA_RES = th.cat([X_A, X_A_], dim=-1)
+				XA_RES = to_grid(XA_RES, nb_rows=1) 
+				XA_RES = th2cv(XA_RES) * 255
+				cv2.imwrite(path.join(storage, f'img_{epoch_counter:03d}{idx:03d}.jpg'), XA_RES)
 
 		epoch_counter = epoch_counter + 1
 
