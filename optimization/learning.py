@@ -100,15 +100,19 @@ def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, pair
 			OPT_DA.step()
 
 			logger.debug(f'[{nb_epochs:03d}/{epoch_counter:03d}]:{idx:05d} >> TOT : {TOT.item():07.3f}, LDA : {LDA.item():07.3f}, LDB : {LDB.item():07.3f}')
-			if idx % 10 == 0:
-				X_A = X_A.cpu()
-				X_B_ = X_B_.cpu()
-				XA_RES = th.cat([X_A, B_A_], dim=-1)
+			if idx % 500 == 0:
+				XA_RES = th.cat([X_A.cpu(), X_B_.cpu(), X_B.cpu(), X_A_.cpu()], dim=-1)
 				XA_RES = to_grid(XA_RES, nb_rows=1) 
 				XA_RES = th2cv(XA_RES) * 255
-				cv2.imwrite(path.join(storage, f'img_{epoch_counter:03d}{idx:03d}.jpg'), XA_RES)
+				cv2.imwrite(path.join(storage, f'img_{epoch_counter:03d}_{idx:05d}.jpg'), XA_RES)
 
 		epoch_counter = epoch_counter + 1
+		if epoch_counter % 10 == 0:	
+			th.save(G_A2B, f'G_A2B_{epoch_counter:03d}.th')
+			th.save(G_B2A, f'G_B2A_{epoch_counter:03d}.th')
+
+	th.save(G_A2B, 'G_A2B_###.th')
+	th.save(G_B2A, 'G_B2A_###.th')
 
 if __name__ == '__main__':
 	train()

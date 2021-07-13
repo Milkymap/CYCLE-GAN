@@ -2,13 +2,13 @@ import torch as th
 import torch.nn as nn 
 
 class C7S1K(nn.Module):
-	def __init__(self, i_channels, o_channels):
+	def __init__(self, i_channels, o_channels, normalize=True, activation=nn.ReLU):
 		super(C7S1K, self).__init__()
 		self.body = nn.Sequential(
 			nn.ReflectionPad2d(3),
 			nn.Conv2d(i_channels, o_channels, 7, 1),
-			nn.InstanceNorm2d(o_channels),
-			nn.ReLU()
+			nn.InstanceNorm2d(o_channels) if normalize else nn.Identity(),
+			activation()
 		)
 
 	def forward(self, X):
@@ -78,7 +78,7 @@ class Generator(nn.Module):
 				for idx in range(nb_down, 0, -1) 
 			]
 		)
-		self.term = C7S1K(o_channels, i_channels)
+		self.term = C7S1K(o_channels, i_channels, False, nn.Tanh)
 		self.apply(self.__initialize_weights)
 
 	def forward(self, X):	
