@@ -92,12 +92,11 @@ def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, pair
 			LDA.backward()
 			OPT_DA.step()
 
-
 			OPT_DB.zero_grad()
 			X_BH = XB_BUFFER.push_and_pop(X_B_)
-			LDB = (GAN_Loss(DIS_A(X_B), RL) + GAN_Loss(DIS_A(X_BH.detach()), FL)) / 2
+			LDB = (GAN_Loss(DIS_B(X_B), RL) + GAN_Loss(DIS_B(X_BH.detach()), FL)) / 2
 			LDB.backward()
-			OPT_DA.step()
+			OPT_DB.step()
 
 			logger.debug(f'[{nb_epochs:03d}/{epoch_counter:03d}]:{idx:05d} >> TOT : {TOT.item():07.3f}, LDA : {LDA.item():07.3f}, LDB : {LDB.item():07.3f}')
 			if idx % 500 == 0:
@@ -110,9 +109,13 @@ def train(gpu_idx, height, width, source_x0, source_x1, nb_epochs, bt_size, pair
 		if epoch_counter % 10 == 0:	
 			th.save(G_A2B, f'G_A2B_{epoch_counter:03d}.th')
 			th.save(G_B2A, f'G_B2A_{epoch_counter:03d}.th')
+			th.save(DIS_A, f'DIS_A_{epoch_counter:03d}.th')
+			th.save(DIS_B, f'DIS_B_{epoch_counter:03d}.th')
 
 	th.save(G_A2B, 'G_A2B_###.th')
 	th.save(G_B2A, 'G_B2A_###.th')
-
+	th.save(DIS_A, 'DIS_A_###.th')
+	th.save(DIS_B, 'DIS_B_###.th')
+			
 if __name__ == '__main__':
 	train()
