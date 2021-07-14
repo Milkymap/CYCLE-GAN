@@ -1,8 +1,7 @@
 # CYCLE-GAN
 This is an implementation of of the paper Unpaired Image-to-Image Translationusing Cycle-Consistent Adversarial Networks
 
-
-# super resolution generative adversarial network
+# image to image translation 
 <p align="center"> 
   <img src="./readme_utils/cycle_gan_001.png" width="640">
   <h3 align="center">
