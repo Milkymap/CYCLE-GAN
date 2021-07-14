@@ -11,7 +11,7 @@ This is an implementation of of the paper Unpaired Image-to-Image Translationusi
 
 ---
 ---
-# abstract (papper)
+# abstract (paper)
 
 Image-to-image  translation  is  a  class  of  vision  andgraphics problems where the goal is to learn the mappingbetween an input image and an output image using a train-ing set of aligned image pairs.   However,  for many tasks,paired training data will not be available.  We present anapproach for learning to translate an image from a sourcedomainXto a target domainYin the absence of pairedexamples.   Our goal is to learn a mappingG:X→Ysuch that the distribution of images fromG(X)is indistin-guishable from the distributionYusing an adversarial loss.Because this mapping is highly under-constrained, we cou-ple it with an inverse mappingF:Y→Xand introduce acycle consistency lossto enforceF(G(X))≈X(and viceversa).   Qualitative results are presented on several taskswhere paired training data does not exist, including collec-tion  style  transfer,  object  transfiguration,  season  transfer,photo enhancement, etc. Quantitative comparisons againstseveral  prior  methods  demonstrate  the  superiority  of  ourapproach.
 
